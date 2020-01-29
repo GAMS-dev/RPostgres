@@ -262,11 +262,12 @@ setMethod("dbExistsTable", c("PqConnection", "Id"), function(conn, name, ...) {
 
 exists_table <- function(conn, id) {
   query <- paste0(
-    "SELECT COUNT(*) FROM ",
-    find_table(conn, id)
+    "SELECT to_regclass(",
+    dbQuoteString(conn, id[["table"]]),
+    ")"
   )
 
-  dbGetQuery(conn, query)[[1]] >= 1
+  !is.na(dbGetQuery(conn, query)[[1]])
 }
 
 find_table <- function(conn, id, inf_table = "tables", only_first = FALSE) {
